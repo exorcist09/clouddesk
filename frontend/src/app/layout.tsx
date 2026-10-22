@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CloudDesk — Smart Customer Support Agent",
+  title: "CloudDesk",
   description: "Autonomous multi-agent customer support with LangGraph RAG and human-in-the-loop review.",
 };
 
@@ -34,9 +34,6 @@ export default function RootLayout({
           <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-8">
               <Link href="/" className="flex items-center gap-2.5 group">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-tr from-indigo-600 to-violet-500 text-white font-bold text-lg shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
-                  C
-                </div>
                 <div>
                   <span className="font-bold text-base tracking-tight text-zinc-100 group-hover:text-indigo-300 transition-colors">
                     CloudDesk
@@ -85,10 +82,6 @@ export default function RootLayout({
           {children}
         </main>
 
-        {/* Footer */}
-        <footer className="border-t border-zinc-800/60 py-6 text-center text-xs text-zinc-600">
-          CloudDesk Smart Support Agent — LangGraph Multi-Agent RAG System
-        </footer>
       </body>
     </html>
   );

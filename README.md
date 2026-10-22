@@ -66,7 +66,7 @@ Instead of splitting relational data and vector embeddings across separate platf
 - **Fast feedback**: The full 61-test suite runs in under 2 seconds, covering API contracts, LangGraph transitions, mock LLM fallbacks, and review cycles.
 
 ### Why Next.js
-Next.js 16 (App Router) powers the agent and manager dashboard:
+Next.js 16 powers the agent and manager dashboard:
 
 - **Suspense boundaries** for fast initial render and live ticket inspection.
 - **Status polling** every 2.5s while background LangGraph tasks triage tickets.
@@ -79,7 +79,8 @@ Next.js 16 (App Router) powers the agent and manager dashboard:
 ### Option 1: Docker Compose (Recommended)
 
 ```bash
-git clone https://github.com/exorcist09/clouddesk.git && cd clouddesk
+git clone https://github.com/exorcist09/clouddesk.git 
+cd clouddesk
 cp .env.example .env
 docker compose up --build
 ```
@@ -113,7 +114,8 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 **3. Frontend**
 ```bash
 cd frontend
-bun install && bun run dev
+bun install #or npm install
+bun run dev #or npm run dev
 ```
 
 
@@ -137,8 +139,6 @@ bun install && bun run dev
 ## How I Used AI
 
 I treated AI as a pair-programmer: good at boilerplate and exploring options, but not trusted with architecture, safety-critical logic, or anything I couldn't verify. The rule: **AI proposes, tests and I decide.**
-
-### Decisions Owned by AI vs Human Developer
 
 | Delegated to AI | Owned by me |
 |---|---|

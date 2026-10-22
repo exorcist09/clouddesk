@@ -28,13 +28,24 @@ async def classify_ticket_node(state: TicketState) -> dict[str, Any]:
     subject = state.get("subject", "")
     body = state.get("body", "")
 
+    settings = get_settings()
     result = await classify_ticket(subject, body)
-    return {
+    is_low_conf = result.confidence < settings.confidence_threshold
+
+    updates: dict[str, Any] = {
         "domain": result.domain.value,
         "confidence": result.confidence,
         "classification_explanation": result.explanation,
         "status": "PROCESSING",
     }
+    if is_low_conf:
+        updates["escalation_required"] = True
+        updates["escalation_reason"] = (
+            f"Low classification confidence: {result.confidence:.2f} "
+            f"(threshold: {settings.confidence_threshold:.2f})"
+        )
+
+    return updates
 
 
 def check_confidence_edge(state: TicketState) -> str:

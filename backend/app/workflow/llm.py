@@ -21,19 +21,31 @@ def _fallback_classify(subject: str, body: str) -> ClassificationResult:
     """Heuristic fallback classification when OpenRouter API is unavailable or unconfigured."""
     text = f"{subject} {body}".lower()
 
+    # Check Technical Support (bugs, errors, crashes, outages, data loss, security concerns, breaches)
+    if any(k in text for k in [
+        "bug", "error", "crash", "gantt", "slow", "down", "outage", "broken", "fail",
+        "chrome", "webgl", "data loss", "lost data", "corrupted", "wiped", "database",
+        "security", "breach", "vulnerability", "cve", "hacked", "leak", "exploit", "incident"
+    ]):
+        return ClassificationResult(
+            domain=TicketDomain.TECHNICAL_SUPPORT,
+            confidence=0.95,
+            explanation="Detected technical, security, or data loss keywords in ticket text",
+        )
+
+    # Check Billing
     if any(k in text for k in ["bill", "invoice", "payment", "charge", "refund", "subscription", "pricing", "cost", "receipt"]):
         return ClassificationResult(
             domain=TicketDomain.BILLING,
             confidence=0.92,
             explanation="Detected billing keywords in ticket text",
         )
-    if any(k in text for k in ["bug", "error", "crash", "gantt", "slow", "down", "outage", "broken", "fail", "chrome", "webgl"]):
-        return ClassificationResult(
-            domain=TicketDomain.TECHNICAL_SUPPORT,
-            confidence=0.95,
-            explanation="Detected technical issue keywords in ticket text",
-        )
-    if any(k in text for k in ["account", "password", "2fa", "login", "team", "invite", "delete", "profile", "user"]):
+
+    # Check Account Management
+    if any(k in text for k in [
+        "delete account", "close account", "erase data", "gdpr",
+        "account", "password", "2fa", "login", "team", "invite", "profile", "user"
+    ]):
         return ClassificationResult(
             domain=TicketDomain.ACCOUNT_MANAGEMENT,
             confidence=0.90,
@@ -129,6 +141,10 @@ async def classify_ticket(subject: str, body: str) -> ClassificationResult:
     system_prompt = (
         "You are an expert customer support classifier for CloudDesk.\n"
         "Classify the ticket into exactly one domain: BILLING, TECHNICAL_SUPPORT, ACCOUNT_MANAGEMENT, or UNKNOWN.\n"
+        "Domain Guidelines:\n"
+        "- BILLING: Payments, invoices, charges, subscription plans, refunds, billing disputes.\n"
+        "- TECHNICAL_SUPPORT: Bugs, errors, crashes, outages, how-to questions, feature requests, data loss, database corruption, security vulnerabilities, breaches, exploits, and security alerts.\n"
+        "- ACCOUNT_MANAGEMENT: Login issues, password resets, 2FA, team management, user profiles, and account deletion/closure requests.\n"
         "Provide a confidence score between 0.0 and 1.0.\n"
         "Return ONLY JSON: {\"domain\": \"...\", \"confidence\": 0.95, \"explanation\": \"...\"}"
     )

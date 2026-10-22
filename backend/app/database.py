@@ -16,11 +16,14 @@ class Base(DeclarativeBase):
     """Shared declarative base for all ORM models."""
 
 
+from sqlalchemy.pool import NullPool
+
+
 def _make_engine() -> object:
     settings = get_settings()
     return create_async_engine(
         settings.async_database_url,
-        pool_pre_ping=True,
+        poolclass=NullPool,
         echo=False,
     )
 

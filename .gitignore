@@ -1,4 +1,9 @@
 .env
+.env.example
+.env*
+
+Implementation.md
+
 __pycache__/
 *.pyc
 *.pyo
@@ -22,3 +27,6 @@ out/
 # IDE
 .vscode/
 .idea/
+
+
+graphify-out/

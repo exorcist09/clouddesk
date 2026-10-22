@@ -11,10 +11,14 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      clouddesk-net:
+        aliases:
+          - db
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-clouddesk} -d ${POSTGRES_DB:-clouddesk}"]
-      interval: 5s
-      timeout: 5s
+      interval: 3s
+      timeout: 3s
       retries: 5
 
   api:
@@ -35,6 +39,8 @@ services:
       CONFIDENCE_THRESHOLD: ${CONFIDENCE_THRESHOLD:-0.65}
     ports:
       - "8000:8000"
+    networks:
+      - clouddesk-net
     depends_on:
       db:
         condition: service_healthy
@@ -51,8 +57,14 @@ services:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
     ports:
       - "3000:3000"
+    networks:
+      - clouddesk-net
     depends_on:
       - api
+
+networks:
+  clouddesk-net:
+    driver: bridge
 
 volumes:
   pgdata:

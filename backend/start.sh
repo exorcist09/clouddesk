@@ -3,6 +3,22 @@ set -e
 
 echo "Starting CloudDesk API service..."
 
+echo "Waiting for database (${POSTGRES_HOST:-db}:${POSTGRES_PORT:-5432})..."
+python -c "
+import socket, time, os
+host = os.environ.get('POSTGRES_HOST', 'db')
+port = int(os.environ.get('POSTGRES_PORT', '5432'))
+for _ in range(30):
+    try:
+        with socket.create_connection((host, port), timeout=2):
+            print(f'Connected to database at {host}:{port}')
+            break
+    except Exception as e:
+        time.sleep(1)
+else:
+    print('Warning: Database connection check timed out.')
+"
+
 # Run alembic migrations
 echo "Applying database migrations..."
 alembic upgrade head || echo "Migration notice: continuing..."

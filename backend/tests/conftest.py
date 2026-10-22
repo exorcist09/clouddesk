@@ -8,6 +8,7 @@ from __future__ import annotations
 import asyncio
 import os
 from collections.abc import AsyncGenerator
+from typing import Any
 
 import pytest
 import pytest_asyncio
@@ -53,3 +54,20 @@ async def db_session(test_engine) -> AsyncGenerator[AsyncSession, None]:
     async with factory() as session:
         yield session
         await session.rollback()
+
+
+@pytest_asyncio.fixture
+async def client(db_session: AsyncSession) -> AsyncGenerator[Any, None]:
+    """Test client hooked to FastAPI app with overridden DB session."""
+    from httpx import ASGITransport, AsyncClient
+    from app.main import app
+    from app.database import get_db_session
+
+    async def _override_get_db():
+        yield db_session
+
+    app.dependency_overrides[get_db_session] = _override_get_db
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        yield ac
+    app.dependency_overrides.clear()

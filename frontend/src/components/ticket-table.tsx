@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { Ticket } from "@/lib/api";
 import { ConfidenceBadge, DomainBadge, StatusBadge } from "@/components/ticket-status";
 
@@ -11,6 +11,8 @@ interface TicketTableProps {
 }
 
 export function TicketTable({ tickets, isLoading }: TicketTableProps) {
+  const router = useRouter();
+
   if (isLoading) {
     return (
       <div className="w-full rounded-xl border border-zinc-800 bg-zinc-900/40 p-12 text-center">
@@ -30,10 +32,10 @@ export function TicketTable({ tickets, isLoading }: TicketTableProps) {
   }
 
   return (
-    <div className="w-full overflow-hidden rounded-xl border border-zinc-800/80 bg-zinc-950/60 shadow-xl backdrop-blur-md">
+    <div className="w-full overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950/60 shadow-md">
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm text-zinc-300">
-          <thead className="bg-zinc-900/60 text-xs font-semibold text-zinc-400 uppercase tracking-wider border-b border-zinc-800/80">
+          <thead className="bg-zinc-900/60 text-xs font-semibold text-zinc-400 uppercase tracking-wider border-b border-zinc-800">
             <tr>
               <th className="px-5 py-3.5">Ticket</th>
               <th className="px-5 py-3.5">Customer</th>
@@ -47,25 +49,22 @@ export function TicketTable({ tickets, isLoading }: TicketTableProps) {
             {tickets.map((t) => (
               <tr
                 key={t.id}
-                className="hover:bg-zinc-800/30 transition-colors group cursor-pointer"
+                onClick={() => router.push(`/ticket/${t.id}`)}
+                className="hover:bg-zinc-800/50 transition-colors group cursor-pointer"
               >
                 <td className="px-5 py-4 font-medium text-zinc-100">
-                  <Link href={`/ticket/${t.id}`} className="block">
-                    <span className="font-semibold text-zinc-200 group-hover:text-indigo-400 transition-colors line-clamp-1">
-                      {t.subject}
-                    </span>
-                    <span className="text-xs text-zinc-500 font-mono mt-0.5 block">
-                      #{t.id.slice(0, 8)}
-                    </span>
-                  </Link>
+                  <div className="font-semibold text-zinc-200 group-hover:text-indigo-400 transition-colors line-clamp-1">
+                    {t.subject}
+                  </div>
+                  <div className="text-xs text-zinc-500 font-mono mt-0.5">
+                    #{t.id.slice(0, 8)}
+                  </div>
                 </td>
                 <td className="px-5 py-4">
-                  <Link href={`/ticket/${t.id}`} className="block">
-                    <div className="text-zinc-200 font-medium">{t.customer_name || "—"}</div>
-                    <div className="text-xs text-zinc-400 truncate max-w-[200px]">
-                      {t.customer_email}
-                    </div>
-                  </Link>
+                  <div className="text-zinc-200 font-medium">{t.customer_name || "—"}</div>
+                  <div className="text-xs text-zinc-400 truncate max-w-[200px]">
+                    {t.customer_email}
+                  </div>
                 </td>
                 <td className="px-5 py-4">
                   <DomainBadge domain={t.domain} />

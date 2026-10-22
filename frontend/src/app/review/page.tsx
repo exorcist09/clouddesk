@@ -33,16 +33,8 @@ export default function ReviewQueuePage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-zinc-800 pb-5">
         <div>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/"
-              className="text-xs font-medium text-zinc-400 hover:text-white transition"
-            >
-              ← Back to Dashboard
-            </Link>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white mt-2">
-            Manager Review Queue
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
+            Admin Review Queue
           </h1>
           <p className="text-sm text-zinc-400 mt-1">
             Review escalated tickets before automated delivery to customers.

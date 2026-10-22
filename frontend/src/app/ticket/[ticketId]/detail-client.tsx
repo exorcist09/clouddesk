@@ -5,7 +5,6 @@ import Link from "next/link";
 import type { Ticket } from "@/lib/api";
 import { getTicket } from "@/lib/api";
 import { ConfidenceBadge, DomainBadge, StatusBadge } from "@/components/ticket-status";
-import { ReviewPanel } from "@/components/review-panel";
 
 export function TicketDetailClient({ ticketId }: { ticketId: string }) {
   const [ticket, setTicket] = useState<Ticket | null>(null);
@@ -85,7 +84,7 @@ export function TicketDetailClient({ ticketId }: { ticketId: string }) {
       <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-xl backdrop-blur-md space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800/80 pb-4">
           <div className="flex items-center gap-2.5">
-            <span className="text-xs font-mono text-zinc-500">#{ticket.id}</span>
+            <span className="text-xs font-mono text-zinc-500">#{ticket.id.slice(0, 8)}</span>
             <StatusBadge status={ticket.status} />
           </div>
           <div className="text-xs text-zinc-400">
@@ -125,11 +124,11 @@ export function TicketDetailClient({ ticketId }: { ticketId: string }) {
         </div>
       </div>
 
-      {/* Escalation Warning */}
+      {/* Escalation Rule Alert */}
       {ticket.escalation_required && (
         <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-5 space-y-1">
           <div className="text-xs font-bold text-amber-400 uppercase tracking-wider">
-            Escalation Rule Triggered
+            Escalation Trigger
           </div>
           <p className="text-sm text-amber-200 font-medium">
             {ticket.escalation_reason || "Escalated for human oversight."}
@@ -147,44 +146,56 @@ export function TicketDetailClient({ ticketId }: { ticketId: string }) {
         </div>
       </div>
 
-      {/* AI Draft vs Final Reply */}
-      {ticket.final_reply ? (
+      {/* Pending Human Approval Status Card (Shown to customer when ticket is in review) */}
+      {ticket.status === "PENDING_REVIEW" && (
+        <div className="rounded-2xl border border-amber-500/30 bg-zinc-900/60 p-6 space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
+              <h3 className="text-sm font-semibold text-amber-300">
+                Pending Human Approval
+              </h3>
+            </div>
+            <span className="px-3 py-1 rounded-full text-xs font-medium bg-amber-500/10 border border-amber-500/20 text-amber-400">
+              In Review Queue
+            </span>
+          </div>
+          <p className="text-xs text-zinc-300 leading-relaxed">
+            This inquiry triggered a business safety escalation rule and is currently awaiting approval from a support manager. A verified response will be dispatched once reviewed.
+          </p>
+          <div className="pt-2 border-t border-zinc-800/60">
+            <Link
+              href="/review"
+              className="inline-flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 font-medium transition"
+            >
+              Are you an administrator? Open Admin Review Queue →
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Final Reply (if resolved) */}
+      {ticket.final_reply && (
         <div className="rounded-2xl border border-emerald-500/30 bg-emerald-950/15 p-6 space-y-2">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">
-              Final Resolved Reply Sent to Customer
+              Final Resolved Reply
             </h3>
             <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/20 text-emerald-300">
-              Resolved
+              Delivered
             </span>
           </div>
           <div className="rounded-xl border border-emerald-500/20 bg-zinc-950/90 p-5 text-sm text-zinc-200 whitespace-pre-wrap leading-relaxed">
             {ticket.final_reply}
           </div>
         </div>
-      ) : ticket.draft_reply ? (
-        <div className="rounded-2xl border border-indigo-500/30 bg-indigo-950/15 p-6 space-y-2">
-          <h3 className="text-xs font-semibold text-indigo-400 uppercase tracking-wider">
-            AI Generated Draft
-          </h3>
-          <div className="rounded-xl border border-indigo-500/20 bg-zinc-950/90 p-5 text-sm text-zinc-200 whitespace-pre-wrap leading-relaxed">
-            {ticket.draft_reply}
-          </div>
-        </div>
-      ) : null}
+      )}
 
       {/* Error Info if Failed */}
       {ticket.error_info && (
         <div className="rounded-xl border border-red-500/30 bg-red-950/20 p-4">
           <span className="text-xs font-semibold text-red-400 uppercase block">Error Info</span>
           <p className="text-xs text-red-200 mt-1 font-mono">{ticket.error_info}</p>
-        </div>
-      )}
-
-      {/* Manager Review Action Panel if ticket is PENDING_REVIEW */}
-      {ticket.status === "PENDING_REVIEW" && (
-        <div className="pt-2">
-          <ReviewPanel ticket={ticket} onReviewed={fetchTicket} />
         </div>
       )}
     </div>

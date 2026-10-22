@@ -72,17 +72,22 @@ export default function DashboardPage() {
     }
   };
 
-  const setSampleScenario = (scenario: "billing" | "gantt" | "delete" | "2fa") => {
+  const setSampleScenario = (scenario: "billing" | "data_loss" | "security" | "delete" | "2fa") => {
     if (scenario === "billing") {
       setCustomerName("Priya Sharma");
       setCustomerEmail("priya.sharma@acmecorp.com");
       setSubject("Duplicate charge for ₹2999 on my account");
       setBody("I see two separate ₹2999 transactions for my monthly renewal. Please refund the duplicate.");
-    } else if (scenario === "gantt") {
+    } else if (scenario === "data_loss") {
       setCustomerName("Rahul Mehta");
       setCustomerEmail("rahul.mehta@startup.io");
-      setSubject("Gantt chart not rendering on Chrome");
-      setBody("Whenever I open the Gantt chart in Chrome 124, the entire canvas is blank.");
+      setSubject("Critical data loss: production records wiped");
+      setBody("After the recent system sync, our customer database suffered complete data loss. Over 1,000 records were deleted and wiped from production. Please escalate immediately.");
+    } else if (scenario === "security") {
+      setCustomerName("Vikram Singh");
+      setCustomerEmail("vikram@cybersec.co");
+      setSubject("Security breach alert: unauthorized vulnerability exploit");
+      setBody("We detected an unauthorized credential leak and potential CVE exploit on our API. We suspect a security breach on our tenant.");
     } else if (scenario === "delete") {
       setCustomerName("Anjali Patel");
       setCustomerEmail("anjali.patel@freelance.dev");
@@ -125,7 +130,7 @@ export default function DashboardPage() {
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/30 transition cursor-pointer"
+            className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition cursor-pointer"
           >
             + New Ticket
           </button>
@@ -134,30 +139,27 @@ export default function DashboardPage() {
 
       {/* Metrics Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/40 p-4 backdrop-blur-sm">
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
           <div className="text-xs font-medium text-zinc-400">Total Tickets</div>
           <div className="text-2xl font-bold text-zinc-100 mt-1 tabular-nums">{total}</div>
         </div>
 
         <Link
           href="/review"
-          className="rounded-xl border border-amber-500/20 bg-amber-500/5 hover:border-amber-500/40 p-4 backdrop-blur-sm transition group"
+          className="rounded-xl border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800/80 p-4 transition group"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-amber-400">Pending Review</span>
-            <span className="text-[10px] uppercase font-bold text-amber-500 group-hover:translate-x-0.5 transition-transform">
-              Queue →
-            </span>
           </div>
           <div className="text-2xl font-bold text-amber-300 mt-1 tabular-nums">{pendingReviewCount}</div>
         </Link>
 
-        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 backdrop-blur-sm">
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
           <div className="text-xs font-medium text-emerald-400">Auto-Resolved</div>
           <div className="text-2xl font-bold text-emerald-300 mt-1 tabular-nums">{resolvedCount}</div>
         </div>
 
-        <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4 backdrop-blur-sm">
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
           <div className="text-xs font-medium text-blue-400">Processing</div>
           <div className="text-2xl font-bold text-blue-300 mt-1 tabular-nums">{processingCount}</div>
         </div>
@@ -236,28 +238,35 @@ export default function DashboardPage() {
                 <button
                   type="button"
                   onClick={() => setSampleScenario("billing")}
-                  className="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-[11px] text-zinc-300 border border-zinc-700"
+                  className="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-[11px] text-zinc-300 border border-zinc-700 cursor-pointer"
                 >
                   ⚡ Duplicate Charge
                 </button>
                 <button
                   type="button"
-                  onClick={() => setSampleScenario("gantt")}
-                  className="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-[11px] text-zinc-300 border border-zinc-700"
+                  onClick={() => setSampleScenario("data_loss")}
+                  className="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-[11px] text-zinc-300 border border-zinc-700 cursor-pointer"
                 >
-                  ⚡ Gantt Bug
+                  ⚡ Data Loss
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSampleScenario("security")}
+                  className="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-[11px] text-zinc-300 border border-zinc-700 cursor-pointer"
+                >
+                  ⚡ Security Alert
                 </button>
                 <button
                   type="button"
                   onClick={() => setSampleScenario("delete")}
-                  className="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-[11px] text-zinc-300 border border-zinc-700"
+                  className="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-[11px] text-zinc-300 border border-zinc-700 cursor-pointer"
                 >
                   ⚡ Delete Account
                 </button>
                 <button
                   type="button"
                   onClick={() => setSampleScenario("2fa")}
-                  className="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-[11px] text-zinc-300 border border-zinc-700"
+                  className="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-[11px] text-zinc-300 border border-zinc-700 cursor-pointer"
                 >
                   ⚡ Update 2FA
                 </button>

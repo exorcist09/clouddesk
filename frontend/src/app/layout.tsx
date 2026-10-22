@@ -30,7 +30,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100 antialiased selection:bg-indigo-500/30 selection:text-indigo-200">
         {/* Top Navbar */}
-        <header className="sticky top-0 z-50 border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-md">
+        <header className="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-950/95 backdrop-blur-md">
           <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-8">
               <Link href="/" className="flex items-center gap-2.5 group">
@@ -55,7 +55,7 @@ export default function RootLayout({
                   href="/review"
                   className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-800/50 transition-colors"
                 >
-                  Review Queue
+                  Admin Review Queue
                 </Link>
               </nav>
             </div>
@@ -69,10 +69,6 @@ export default function RootLayout({
               >
                 API Docs ↗
               </a>
-              <div className="flex items-center gap-2 text-xs font-medium text-zinc-400 bg-zinc-900/80 border border-zinc-800 px-3 py-1.5 rounded-full">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Agent Online</span>
-              </div>
             </div>
           </div>
         </header>

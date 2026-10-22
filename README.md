@@ -1,6 +1,13 @@
 # CloudDesk - Smart Customer Support Agent
 
-An autonomous multi-agent customer support engine that triages, retrieves domain context, and resolves inquiries - halting for human review whenever business safety rules trigger.
+CloudDesk is a customer support system that resolves routine inquiries automatically while keeping humans in control of sensitive cases.
+
+AI support tools can give inaccurate answers or mishandle billing and account requests. CloudDesk reduces this risk with domain-based ticket routing, knowledge-base retrieval, and **deterministic, code-enforced escalation rules**.
+
+- **Auto-resolve** straightforward inquiries using internal knowledge articles and known-issue data.
+- **Escalate** high-risk cases to a human review queue: billing disputes, transactions over ₹5,000, account deletions, data loss, security concerns, and low-confidence classifications.
+- **Pause and resume** workflows, continuing after a reviewer approves, edits, or rejects the proposed resolution.
+
 
 ## Table of Contents
 
@@ -16,19 +23,6 @@ An autonomous multi-agent customer support engine that triages, retrieves domain
 
 ---
 
-## The Problem & Motivation
-
-CloudDesk is a smart customer support system designed to help support teams handle repetitive inquiries while maintaining human oversight for sensitive cases.
-
-AI-based support systems can generate inaccurate answers, suggest invalid workarounds, or mishandle sensitive account and billing requests. CloudDesk addresses these risks through domain-specific ticket routing, knowledge-base retrieval, and **deterministic, code-enforced escalation rules**.
-
-The system is designed to:
-
-- Automatically resolve straightforward inquiries using relevant internal knowledge articles and known-issue information.
-- Escalate high-risk cases—including billing disputes, transactions exceeding ₹5,000, account deletion requests, data loss, security concerns, and low-confidence classifications—to a human review queue.
-- Persist paused workflows and resume processing after a human reviewer approves, edits, or rejects a proposed resolution.
-
----
 
 ## Architecture & Workflow
 
@@ -62,9 +56,9 @@ flowchart TD
 
 Instead of splitting relational data and vector embeddings across separate platforms (e.g. Postgres + Pinecone/Qdrant), CloudDesk runs entirely on **PostgreSQL 16 with the `pgvector` extension**:
 
-- **Transactional ACID Integrity**: Customer profiles, transactions, review decisions, and tickets live in one transactional boundary. Foreign keys and unique constraints (e.g., preventing duplicate reviews) operate atomically with vector updates.
-- **Single-Query Hybrid Filtering**: Semantic similarity search and metadata filters (`category = 'technical_support' AND embedding <=> query_vector`) execute in a single SQL query plan without extra network hops.
-- **Zero Additional Infrastructure**: Eliminates third-party vector SaaS latency, external API quotas, network failure modes, and subscription costs.
+- **ACID integrity**: Customers, transactions, reviews, and tickets share one transactional boundary, so constraints (e.g., no duplicate reviews) apply atomically with vector updates.
+- **Hybrid filtering in one query**: Metadata filters and semantic similarity search run in a single SQL plan, with no extra network hops.
+- **Less infrastructure**: No third-party vector service, API quotas, or added failure modes.
 
 ### Why Pytest
 - **Deterministic safety checks**: All 13 escalation rules (transactions > ₹5,000, account deletion, data loss, security keywords, confidence < 0.65) are verified across edge cases in milliseconds.
@@ -77,34 +71,6 @@ Next.js 16 (App Router) powers the agent and manager dashboard:
 - **Suspense boundaries** for fast initial render and live ticket inspection.
 - **Status polling** every 2.5s while background LangGraph tasks triage tickets.
 - **Typed API layer** with shared TypeScript interfaces matching FastAPI Pydantic schemas.
-
----
----
-
-## Environment Variables
-
-```bash
-cp .env.example .env
-```
-
-```env
-# LLM & Embeddings (OpenRouter)
-OPENROUTER_API_KEY=your_openrouter_api_key_here
-OPENROUTER_MODEL=meta-llama/llama-3.3-70b-instruct:free
-EMBEDDING_MODEL=nvidia/nemotron-3-embed-1b:free
-EMBEDDING_DIM=1536
-CONFIDENCE_THRESHOLD=0.65
-
-# Database
-POSTGRES_USER=clouddesk
-POSTGRES_PASSWORD=clouddesk
-POSTGRES_DB=clouddesk
-POSTGRES_HOST=db       # Use 'localhost' for local development
-POSTGRES_PORT=5432
-
-# Frontend
-NEXT_PUBLIC_API_URL=http://localhost:8000
-```
 
 ---
 
@@ -179,7 +145,7 @@ I treated AI as a pair-programmer: good at boilerplate and exploring options, bu
 | Pydantic schema scaffolding | Escalation rules: deterministic Python, never LLM prompts |
 | Regex variants for escalation triggers | LangGraph interrupt/resume design (`interrupt()`, `Command(resume=...)`) |
 | ORM relation boilerplate | Embedding strategy: remote OpenRouter over local PyTorch |
-| Next.js layout structure | Test strategy covering every escalation rule and edge case |
+| Next.js frontend | Test strategy covering every escalation rule and edge case |
 
 **Why this split:** Refund thresholds, account deletions, and security flags are high-risk decisions that must be auditable and reproducible, which an LLM can't guarantee. AI helped write the rules, but never decides them at runtime.
 
@@ -199,7 +165,7 @@ I treated AI as a pair-programmer: good at boilerplate and exploring options, bu
 ## Assumptions, Blockers & Roadmap
 
 ### Assumptions
-- **OpenRouter Free Tier Availability**: Default LLM routes use `meta-llama/llama-3.3-70b-instruct:free` and `nvidia/nemotron-3-embed-1b:free`. If no API key is supplied, heuristic offline fallbacks ensure the app and test suite run without crashing.
+- **OpenRouter Free Tier Availability**: Default LLM routes use `meta-llama/llama-3.3-70b-instruct:free` and `nvidia/nemotron-3-embed-1b:free`. 
 - **Single Manager Review**: A ticket in `PENDING_REVIEW` is resolved by the first manager decision submitted. Duplicate reviews return `409 Conflict`.
 - **Idempotent Data Seeding**: Seed script uses deterministic IDs and `ON CONFLICT` checks, allowing safe repeated runs.
 
@@ -217,5 +183,5 @@ I treated AI as a pair-programmer: good at boilerplate and exploring options, bu
 ---
 
 ### Time Spent
-- **Total Time**: ~5 hours of active development and testing and major chunk was thinking and writing a technical documentation.
+- **Total Time**: ~4.5 hours of active development and testing and major chunk was thinking and writing a technical documentation.
 - **Video Creation and Editing Time**: ~1 hour
